@@ -65,6 +65,7 @@
     <Compile Include="Assets\Script\HeathySqure.cs" />
     <Compile Include="Assets\Script\Map.cs" />
     <Compile Include="Assets\Script\MapUnit.cs" />
+    <Compile Include="Assets\Script\TimeCounter.cs" />
     <None Include="Assets\Material\S_MapUnit.shader" />
     <Reference Include="Unity.TextMeshPro.Editor">
       <HintPath>D:/project/unity/Avoid/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>

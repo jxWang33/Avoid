@@ -1,35 +1,32 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class BallState : MonoBehaviour
 {
-
-    public GameObject circle;
     public static GameObject map;
     public int hp;
     public RaycastHit debug;
     public bool isPoison;
 
-    private static float interTime = 1.000f;
-    private float timeCount;
-    private static int maxCount = 5;
-    private int remainCount;
-    private static int damage = 5;
+    public static Color color = Color.green;
+    public static Color damagedColor = Color.red;
+    private static float damageInterTime = 1.000f;
+    private float damageTimeCount;
+    private static int maxDamageCount = 5;
+    private int remainDamageCount;
+    private static int damagePerCount = 5;
     // Start is called before the first frame update
     void Start()
     {
         map = GameObject.Find("map");
+        GetComponent<SpriteRenderer>().color = color;
         hp = 100;
-
         isPoison = false;
-        remainCount = maxCount;
-        timeCount = interTime+0.1f;
-
-        transform.position = new Vector3(2.5f,2.5f,-10f);
-        this.gameObject.name = "circle";
-        GetComponent<BallMove>().enabled = true;
-        GetComponent<CircleCollider2D>().enabled = true;
+        remainDamageCount = maxDamageCount;
+        damageTimeCount = damageInterTime+0.1f;
+        transform.position = new Vector2(2.5f,2.5f);
     }
 
     // Update is called once per frame
@@ -37,31 +34,45 @@ public class BallState : MonoBehaviour
     {
         if (IsDead())
         {
-            Destroy(this.gameObject);
-            GameObject g = (GameObject)Instantiate(circle);
-            
-            g.GetComponent<BallState>().enabled = true;
+            Clear();
         }
         if (isPoison) {
-            if (timeCount > interTime)
+            if (damageTimeCount > damageInterTime)
             {
-                hp -= damage;
-                remainCount--;
-                timeCount = 0;
+                hp -= damagePerCount;
+                remainDamageCount--;
+                damageTimeCount = 0;
             }
-            if (remainCount < 1)
+            if (remainDamageCount < 1)
             {
-                isPoison = false;
-                remainCount = maxCount;
-                timeCount = interTime + 0.1f;
+                OutPosion();
             }
-            timeCount += Time.deltaTime;
+            damageTimeCount += Time.deltaTime;
         }
+    }
+    private void Clear()
+    {
+        hp = 100;
+        isPoison = false;
+        remainDamageCount = maxDamageCount;
+        damageTimeCount = damageInterTime + 0.1f;
+        transform.position = new Vector2(2.5f, 2.5f);
+        GetComponent<SpriteRenderer>().color = color;
+        //Destroy(GetComponent<Rigidbody2D>());
+        //gameObject.AddComponent<Rigidbody2D>();
+        GetComponent<BallMove>().Clear();
     }
     public void SetPoison()
     {
         isPoison = true;
-        remainCount = maxCount;
+        remainDamageCount = maxDamageCount;
+        GetComponent<SpriteRenderer>().color = damagedColor;
+    }
+    public void OutPosion() {
+        isPoison = false;
+        remainDamageCount = maxDamageCount;
+        damageTimeCount = damageInterTime + 0.1f;
+        GetComponent<SpriteRenderer>().color = color;
     }
     bool IsDead()
     {

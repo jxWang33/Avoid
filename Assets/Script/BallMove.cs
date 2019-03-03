@@ -6,24 +6,29 @@ public class BallMove : MonoBehaviour
 {
     public float currentV;
     [SerializeField]
-    private float maxVelocity = 5.0f;
+    private float maxVelocity;
     private static float k = 2.0f;
     private static float u = 0.1f;
     [SerializeField]
-    private Vector2 horF = new Vector2(k,0);
+    private Vector2 horF;
     [SerializeField]
-    private Vector2 verF = new Vector2(0, k);
+    private Vector2 verF;
 
     enum Dir { Minus,Zero,Positive};
     [SerializeField]
-    private Dir onUp = Dir.Zero;
+    private Dir onUp;
     [SerializeField]
-    private Dir onLeft = Dir.Zero;
+    private Dir onLeft;
 
     // Start is called before the first frame update
     void Start()
     {
-        transform.position = new Vector3(0, 0, 0);
+        maxVelocity = 5.0f;
+        horF = new Vector2(k, 0);
+        verF = new Vector2(0, k);
+        onUp = Dir.Zero;
+        onLeft = Dir.Zero;
+        maxVelocity = 5.0f;
     }
 
     // Update is called once per frame
@@ -53,13 +58,23 @@ public class BallMove : MonoBehaviour
         }
         if (onLeft == Dir.Minus){
             if (Vector2.Dot(-horF, GetComponent<Rigidbody2D>().velocity) < 0 || GetComponent<Rigidbody2D>().velocity.magnitude < maxVelocity)
-                GetComponent<Rigidbody2D>().AddForce(-horF);
+                GetComponent<Rigidbody2D>().AddForce(horF);
         }
         if (onLeft == Dir.Positive){
             if (Vector2.Dot(horF, GetComponent<Rigidbody2D>().velocity) < 0 || GetComponent<Rigidbody2D>().velocity.magnitude < maxVelocity)
-                GetComponent<Rigidbody2D>().AddForce(horF);
+                GetComponent<Rigidbody2D>().AddForce(-horF);
         }
         currentV = GetComponent<Rigidbody2D>().velocity.magnitude;
         GetComponent<Rigidbody2D>().AddForce(GetComponent<Rigidbody2D>().velocity.normalized * -u);
+    }
+    public void Clear() {
+        maxVelocity = 5.0f;
+        horF = new Vector2(k, 0);
+        verF = new Vector2(0, k);
+        onUp = Dir.Zero;
+        onLeft = Dir.Zero;
+        maxVelocity = 5.0f;
+        transform.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
+        transform.GetComponent<Rigidbody2D>().angularVelocity = 0;
     }
 }

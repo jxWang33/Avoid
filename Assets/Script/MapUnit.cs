@@ -6,30 +6,76 @@ using UnityEngine;
 
 public class MapUnit : MonoBehaviour
 {
+    public GameObject playerBall;
     public Triangle triangle;
-    public Color color = Color.white;
-    public bool isInPosion=false;
+    public static Color color = Color.white;
+    public bool isInPosion;
+    private bool shouldRoll;
+    private static float interTime = 1f;
+    private float countInterTime;
+    private static float PoisonTime = 4f;
+    private float countPoisonTime;
+    private double randomNum;
+    private static double probability=0.75d;
     // Start is called before the first frame update
-    public void Set(Triangle t) {
+    public void Set(Triangle t)
+    {
         triangle = t;
-        Vector3[] temp= { triangle.points[0], triangle.points[1], triangle.points[2], triangle.points[0] };
+        Vector3[] temp = { triangle.points[0], triangle.points[1], triangle.points[2], triangle.points[0] };
         GetComponent<LineRenderer>().SetPositions(temp);
     }
     void Start()
     {
-       
+        isInPosion = false;
+        shouldRoll = true;
+        countInterTime = 0;
+        countPoisonTime=0;
+        randomNum = -1;
+        playerBall = GameObject.Find("Circle");
     }
-
-    void SetPosion(object source, System.Timers.ElapsedEventArgs e)
-    {
-    }
-
     // Update is called once per frame
     void Update()
     {
-        System.Random rd = new System.Random();
-        Debug.Log(rd.NextDouble());
-        GetComponent<SpriteRenderer>().color = Color.red;
+        GetComponent<SpriteRenderer>().color = color;
+        countInterTime += Time.deltaTime;
+        System.Random rd = new System.Random(GetRandomSeed());
+        if (countInterTime > interTime)
+        {
+            //Debug.Log(rd.NextDouble());
+            //动画 
+            if(randomNum>probability)
+            {
+                GetComponent<SpriteRenderer>().color = Color.yellow;
+                if (countInterTime > interTime + PoisonTime)
+                {
+                    //毒气喷出
+                    GetComponent<SpriteRenderer>().color = Color.red;
+                    //isInPosion = true;
+
+                    //调Ball
+                    //Debug.Log(playerBall.name);
+                    if (IsInside(playerBall.transform.position.x, playerBall.transform.position.y))
+                    {
+                        playerBall.GetComponent<BallState>().SetPoison();
+                    }
+                    countInterTime = 0;
+                    randomNum = rd.NextDouble();
+                }
+            }
+            else
+            {
+                countInterTime = 0;
+                randomNum = rd.NextDouble();
+            }
+        }
+
+    }
+    static int GetRandomSeed()
+    {
+        byte[] bytes = new byte[4];
+        System.Security.Cryptography.RNGCryptoServiceProvider rng = new System.Security.Cryptography.RNGCryptoServiceProvider();
+        rng.GetBytes(bytes);
+        return BitConverter.ToInt32(bytes, 0);
     }
     bool IsInside(float x, float y)
     {   //三角形边上的点不算在三角形内
